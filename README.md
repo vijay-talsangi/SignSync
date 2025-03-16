@@ -41,7 +41,7 @@ To set up **SignSync** on your machine, follow these steps:
    ```
 2. **Set Up a Virtual Environment (Recommended)**:
    ```
-   python3 -m venv .venv
+   python3 -m venv venv
    ```
    - For Windows:
      ```
