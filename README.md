@@ -36,7 +36,7 @@ To set up **SignSync** on your machine, follow these steps:
 1. **Clone the repository**:
 
    ```
-   git clone https://github.com/yourusername/SignSync.git
+   git clone https://github.com/vijay-talsangi/SignSync.git
    cd SignSync
    ```
 2. **Set Up a Virtual Environment (Recommended)**:
@@ -61,7 +61,7 @@ To set up **SignSync** on your machine, follow these steps:
      python app.py
     ```
 ## Access Your Web App on:
-    [http://127.0.0.1:5000/](http://127.0.0.1:5000/)
+    [Click me after run](http://127.0.0.1:5000/)
 
 
     
