@@ -60,8 +60,7 @@ To set up **SignSync** on your machine, follow these steps:
     ```
      python app.py
     ```
-## Access Your Web App on:
-    [Click me after run](http://127.0.0.1:5000/)
+**Access Your Web App on:** [Click me after run](http://127.0.0.1:5000/)
 
 
     
