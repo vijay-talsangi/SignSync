@@ -314,6 +314,16 @@
                 </div>
             </div>
         </div> -->
+        <div class="controls">
+            <label for="language">Select Language:</label>
+            <select id="language">
+                <option value="en">English</option>
+                <option value="hi">Hindi</option>
+            </select>
+            <button id="speak-btn" class="btn"><i class="fas fa-play"></i> Speak</button>
+        </div>
+        
+        
     </main>
     <audio id="audio" controls></audio>
     <footer>
@@ -327,21 +337,40 @@
             // Connect to socket
             var socket = io.connect('http://' + document.domain + ':' + location.port);
             
+            // Store the latest recognized word
+            let recognizedWord = '';
+
+            // Dropdown for language selection
+            const languageSelector = document.getElementById('language');
             // Update the word on the frontend as it's being formed
             socket.on('word', (data) => {
+                recognizedWord = data;  // Store the latest recognized word
                 document.getElementById('word').innerText = data;
+                
             });
             // Listen for audio file updates and play the audio
             socket.on('audio_file', (filename) => {
                 const audioElement = document.getElementById('audio');
-                audioElement.src = `audio/${filename}`;
+                const timestamp = new Date().getTime(); // Prevent caching
+                audioElement.src = `audio/${filename}?t=${timestamp}`;
+                audioElement.load();
                 audioElement.play();
             });
             // Reset button functionality
+            // Function to request speech conversion
+            function playSpeech() {
+                const selectedLang = languageSelector.value;
+                if (recognizedWord) {
+                    socket.emit('play_audio', { text: recognizedWord, lang: selectedLang });
+                }
+            }
+            // Button to trigger speech (prevent continuous interruptions)
+            document.getElementById('speak-btn').addEventListener('click', playSpeech);
             const resetBtn = document.querySelector('.btn:first-child');
             resetBtn.addEventListener('click', function() {
                 // You would implement the reset functionality with your backend
                 document.getElementById('word').innerText = 'Waiting for gesture...';
+                recognizedWord = '';
             });
             
             // Example responsiveness enhancement

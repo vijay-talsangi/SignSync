@@ -10,6 +10,9 @@ import pygame
 from gtts import gTTS
 import io
 import warnings
+from indic_transliteration.sanscript import transliterate, IAST, DEVANAGARI
+import time
+import os
 
 # Ignore all warnings
 warnings.filterwarnings("ignore")
@@ -29,7 +32,11 @@ X = data.drop('letter', axis=1)
 y = data['letter']
 model.fit(X, y)
 
-def speech(text):
+def cleanup_audio_files():
+    for file in os.listdir('./audio'):
+        if file.startswith("audio_") and file.endswith(".mp3"):
+            os.remove(os.path.join('./audio', file))
+def speech(text, lang='en'):
     '''
     Converts a piece of text into speech using pyGame and gTTS libraries
 
@@ -38,18 +45,22 @@ def speech(text):
 
     Returns: None
     '''
-    
+    if lang == 'hi':
+        # Convert English letters to Hindi script
+        text = transliterate(text, IAST, DEVANAGARI)
     #Initializes the text
-    myobj = gTTS(text=text, lang='en', slow=False)
+    myobj = gTTS(text=text, lang=lang, slow=False)
     mp3_fp = io.BytesIO()
     myobj.write_to_fp(mp3_fp)
     mp3_fp.seek(0)
 
-    filename = 'audio/output.mp3'
-    myobj.save(filename)  # Save the generated speech as an MP3 file
+    filename = f"audio_{int(time.time())}.mp3"
+    filepath = f'./audio/{filename}'
+    cleanup_audio_files()
+    myobj.save(filepath)
     
     # Emit the filename to frontend
-    socketio.emit('audio_file', 'output.mp3')
+    socketio.emit('audio_file', filename)
 
     # Load the BytesIO object as a sound
     # pygame.mixer.music.load(mp3_fp, 'mp3')
@@ -58,6 +69,12 @@ def speech(text):
     # # Keep the program running while the sound plays
     # while pygame.mixer.music.get_busy():
     #     pygame.time.Clock().tick(10)
+# Handle language selection from frontend
+@socketio.on('play_audio')
+def handle_audio_request(data):
+    text = data['text']
+    lang = data.get('lang', 'en')  # Default to English
+    speech(text, lang)
 def gen():
     """Generate video frames and send predictions to the frontend"""
     pygame.mixer.init()
